@@ -6,6 +6,7 @@
         {
             const ConsoleKey CommandBaseAttack = ConsoleKey.Z;
             const ConsoleKey CommandFireBall = ConsoleKey.X;
+            const ConsoleKey CommandPotion = ConsoleKey.C;
 
             Random random = new();
 
@@ -16,11 +17,11 @@
             int playerBaseAttackDamage = 15000;
             int playerExploseDamage = 40000;
             float playerHealthRecoveryPercent = 0.4f;
-            float playerManaRecoveryPrecent = 0.3f;
+            float playerManaRecoveryPercent = 0.3f;
             float playerCriticalChance = 0.4f;
             float playerCriticalDamageMultiplyer = 2.3f;
-            int playerPotionsCount = 10;
-            int playerExploseAttackStunEffects = 2;
+            int playerPotionsCount = 5;
+            int playerExploseAttackStunEffects = 3;
             int playerFireBallActivationCost = 25;
             bool isFireBallActive = false;
 
@@ -64,7 +65,9 @@
                 {
                     Console.WriteLine($"{CommandFireBall}) Выпустить огненный шар (Стоимость: {playerFireBallActivationCost} маны)");
                 }
-                
+
+                Console.WriteLine($"{CommandPotion}) Использовать зелье (Количество: {playerPotionsCount})");
+
                 ConsoleKey userInput = Console.ReadKey(true).Key;
 
                 switch (userInput)
@@ -115,6 +118,21 @@
                             }
                         }
                         break;
+
+                    case CommandPotion:
+                        if (playerPotionsCount > 0)
+                        {
+                            playerHealth = Math.Min(playerMaxHealth, playerHealth + (int)(playerMaxHealth * playerHealthRecoveryPercent));
+                            playerMana = Math.Min(playerMaxMana, playerMana + (int)(playerMaxMana * playerManaRecoveryPercent));
+                            playerPotionsCount--;
+                            Console.WriteLine("Вы востановили здоровьте и ману");
+                        }
+                        else
+                        {
+                            Console.WriteLine("У вас недостаточно зелий");
+                        }
+                        
+                        break;
                 }
 
                 Console.WriteLine();
@@ -160,6 +178,11 @@
                 else
                 {
                     Console.WriteLine("Противник побеждён");
+                }
+
+                if (playerHealth <= 0)
+                {
+                    Console.WriteLine("Вы проиграли");
                 }
 
                 Console.ReadKey(true);
