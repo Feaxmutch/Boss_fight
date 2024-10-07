@@ -72,6 +72,10 @@
 
                 switch (userInput)
                 {
+                    default:
+                        Console.WriteLine("Вы замешкались, дав противнику сделать ход раньше");
+                        break;
+
                     case CommandBaseAttack:
                         isAttack = true;
                         isCritical = random.NextSingle() <= playerCriticalChance;
