@@ -6,7 +6,8 @@
         {
             const ConsoleKey CommandBaseAttack = ConsoleKey.Z;
             const ConsoleKey CommandFireBall = ConsoleKey.X;
-            const ConsoleKey CommandPotion = ConsoleKey.C;
+            const ConsoleKey CommandExplose = ConsoleKey.C;
+            const ConsoleKey CommandPotion = ConsoleKey.V;
 
             Random random = new();
 
@@ -23,7 +24,7 @@
             int playerPotionsCount = 5;
             int playerExploseAttackStunEffects = 3;
             int playerFireBallActivationCost = 25;
-            bool isFireBallActive = false;
+            int activeFireBallsCount = 0;
 
             int enemyHealth = 1000000;
             int enemyDamage = 150;
@@ -32,14 +33,13 @@
             int enemyActiveStunEffectsCount = 0;
 
             float damageRandomizationOffset = 1.2f;
-            int damage = 0;
-            bool isCritical = false;
-            bool isAttack = false;
-            bool isFight = playerHealth > 0 && enemyHealth > 0;
+            int totalDamage;
+            bool isCritical;
+            bool isAttack;
 
-            while (isFight)
+            while (playerHealth > 0 && enemyHealth > 0)
             {
-                damage = 0;
+                totalDamage = 0;
                 isAttack = false;
                 isCritical = false;
                 Console.Clear();
@@ -56,16 +56,8 @@
 
                 Console.WriteLine();
                 Console.WriteLine($"{CommandBaseAttack}) Базовая атака");
-
-                if (isFireBallActive)
-                {
-                    Console.WriteLine($"{CommandFireBall}) Взорвать огненный шар");
-                }
-                else
-                {
-                    Console.WriteLine($"{CommandFireBall}) Выпустить огненный шар (Стоимость: {playerFireBallActivationCost} маны)");
-                }
-
+                Console.WriteLine($"{CommandFireBall}) Выпустить огненный шар (Стоимость: {playerFireBallActivationCost} маны)");
+                Console.WriteLine($"{CommandExplose}) Взорвать огненный шар (Выпущенно: {activeFireBallsCount})");
                 Console.WriteLine($"{CommandPotion}) Использовать зелье (Количество: {playerPotionsCount})");
 
                 ConsoleKey userInput = Console.ReadKey(true).Key;
@@ -79,48 +71,59 @@
                     case CommandBaseAttack:
                         isAttack = true;
                         isCritical = random.NextSingle() <= playerCriticalChance;
-                        damage = playerBaseAttackDamage;
+                        totalDamage = playerBaseAttackDamage;
 
                         if (isCritical)
                         {
-                            damage = (int)(damage * playerCriticalDamageMultiplyer);
+                            totalDamage = (int)(totalDamage * playerCriticalDamageMultiplyer);
                         }
 
-                        damage = random.Next((int)(damage * (1 / damageRandomizationOffset)), (int)(damage * damageRandomizationOffset));
-                        enemyHealth -= damage;
+                        totalDamage = random.Next((int)(totalDamage * (1 / damageRandomizationOffset)), (int)(totalDamage * damageRandomizationOffset));
+                        enemyHealth -= totalDamage;
                         break;
 
                     case CommandFireBall:
-                        if (isFireBallActive)
+                        if (playerMana >= playerFireBallActivationCost)
                         {
-                            isFireBallActive = false;
-                            isAttack = true;
-                            isCritical = random.NextSingle() <= playerCriticalChance;
-                            damage = playerExploseDamage;
-
-                            if (isCritical)
-                            {
-                                damage = (int)(damage * playerCriticalDamageMultiplyer);
-                            }
-
-                            damage = random.Next((int)(damage * (1 / damageRandomizationOffset)), (int)(damage * damageRandomizationOffset));
-                            enemyHealth -= damage;
-                            enemyActiveStunEffectsCount += playerExploseAttackStunEffects;
-                            Console.WriteLine($"На противника наложено {playerExploseAttackStunEffects} эффекта оглушения");
+                            playerMana -= playerFireBallActivationCost;
+                            activeFireBallsCount++;
+                            Console.WriteLine("Огненый шар выпущен");
                         }
                         else
                         {
-                            if (playerMana >= playerFireBallActivationCost)
-                            {
-                                playerMana -= playerFireBallActivationCost;
-                                isFireBallActive = true;
-                                Console.WriteLine("Огненый шар выпущен");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Недостаточно маны");
-                            }
+                            Console.WriteLine("Недостаточно маны");
                         }
+                        break;
+
+                    case CommandExplose:
+                        if (activeFireBallsCount > 0)
+                        {
+                            for (int i = 0; i < activeFireBallsCount; i++)
+                            {
+                                isAttack = true;
+                                isCritical = random.NextSingle() <= playerCriticalChance;
+                                int damage = playerExploseDamage;
+
+                                if (isCritical)
+                                {
+                                    damage = (int)(damage * playerCriticalDamageMultiplyer);
+                                }
+
+                                damage = random.Next((int)(damage * (1 / damageRandomizationOffset)), (int)(damage * damageRandomizationOffset));
+                                enemyActiveStunEffectsCount += playerExploseAttackStunEffects;
+                                totalDamage += damage;
+                                Console.WriteLine($"На противника наложено {playerExploseAttackStunEffects} эффекта оглушения");
+                            }
+
+                            enemyHealth -= totalDamage;
+                            activeFireBallsCount = 0;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Нет выпущенных огненных шаров");
+                        }
+
+                        
                         break;
 
                     case CommandPotion:
@@ -148,7 +151,7 @@
 
                 if (isAttack)
                 {
-                    Console.WriteLine($"Противнику нанесено {damage} урона");
+                    Console.WriteLine($"Противнику нанесено {totalDamage} урона");
                 }
 
                 Console.ReadKey(true);
@@ -160,18 +163,18 @@
                     {
                         Console.WriteLine("Противник атакует");
                         isCritical = random.NextSingle() <= enemyCriticalChance;
-                        damage = enemyDamage;
+                        totalDamage = enemyDamage;
 
                         if (isCritical)
                         {
-                            damage = (int)(damage * enemyCriticalDamageMultiplyer);
+                            totalDamage = (int)(totalDamage * enemyCriticalDamageMultiplyer);
                             Console.WriteLine("Противник нанёс критический урон");
                         }
 
-                        damage = random.Next((int)(damage * (1 / damageRandomizationOffset)), (int)(damage * damageRandomizationOffset));
-                        playerHealth -= damage;
+                        totalDamage = random.Next((int)(totalDamage * (1 / damageRandomizationOffset)), (int)(totalDamage * damageRandomizationOffset));
+                        playerHealth -= totalDamage;
 
-                        Console.WriteLine($"Противник нанес вам {damage} урона");
+                        Console.WriteLine($"Противник нанес вам {totalDamage} урона");
                     }
                     else
                     {
@@ -190,7 +193,6 @@
                 }
 
                 Console.ReadKey(true);
-                isFight = playerHealth > 0 && enemyHealth > 0;
             }
         }
     }
