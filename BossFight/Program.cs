@@ -59,7 +59,6 @@
                 Console.WriteLine($"{CommandFireBall}) Выпустить огненный шар (Стоимость: {playerFireBallActivationCost} маны)");
                 Console.WriteLine($"{CommandExplose}) Взорвать огненный шар (Выпущенно: {activeFireBallsCount})");
                 Console.WriteLine($"{CommandPotion}) Использовать зелье (Количество: {playerPotionsCount})");
-
                 ConsoleKey userInput = Console.ReadKey(true).Key;
 
                 switch (userInput)
@@ -122,8 +121,6 @@
                         {
                             Console.WriteLine("Нет выпущенных огненных шаров");
                         }
-
-                        
                         break;
 
                     case CommandPotion:
@@ -138,7 +135,6 @@
                         {
                             Console.WriteLine("У вас недостаточно зелий");
                         }
-                        
                         break;
                 }
 
@@ -182,18 +178,21 @@
                         enemyActiveStunEffectsCount--;
                     }
                 }
-                else
-                {
-                    Console.WriteLine("Противник побеждён");
-                }
-
-                if (playerHealth <= 0)
-                {
-                    Console.WriteLine("Вы проиграли");
-                }
 
                 Console.ReadKey(true);
             }
+
+            if (enemyHealth <= 0)
+            {
+                Console.WriteLine("Противник побеждён");
+            }
+
+            if (playerHealth <= 0)
+            {
+                Console.WriteLine("Вы проиграли");
+            }
+
+            Console.ReadKey(true);
         }
     }
 }
