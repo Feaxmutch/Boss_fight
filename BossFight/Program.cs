@@ -109,7 +109,7 @@
                                     damage = (int)(damage * playerCriticalDamageMultiplyer);
                                 }
 
-                                damage = random.Next((int)(damage * (1 / damageRandomizationOffset)), (int)(damage * damageRandomizationOffset));
+                                damage = random.Next((int)(damage * invertedDamageRandomizationOffset), (int)(damage * damageRandomizationOffset));
                                 enemyActiveStunEffectsCount += playerExploseAttackStunEffects;
                                 totalDamage += damage;
                                 Console.WriteLine($"На противника наложено {playerExploseAttackStunEffects} эффекта оглушения");
@@ -168,7 +168,7 @@
                             Console.WriteLine("Противник нанёс критический урон");
                         }
 
-                        totalDamage = random.Next((int)(totalDamage * (1 / damageRandomizationOffset)), (int)(totalDamage * damageRandomizationOffset));
+                        totalDamage = random.Next((int)(totalDamage * invertedDamageRandomizationOffset), (int)(totalDamage * damageRandomizationOffset));
                         playerHealth -= totalDamage;
 
                         Console.WriteLine($"Противник нанес вам {totalDamage} урона");
