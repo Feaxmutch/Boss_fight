@@ -33,6 +33,7 @@
             int enemyActiveStunEffectsCount = 0;
 
             float damageRandomizationOffset = 1.2f;
+            float invertedDamageRandomizationOffset = 1 / damageRandomizationOffset;
             int totalDamage;
             bool isCritical;
             bool isAttack;
@@ -77,7 +78,7 @@
                             totalDamage = (int)(totalDamage * playerCriticalDamageMultiplyer);
                         }
 
-                        totalDamage = random.Next((int)(totalDamage * (1 / damageRandomizationOffset)), (int)(totalDamage * damageRandomizationOffset));
+                        totalDamage = random.Next((int)(totalDamage * invertedDamageRandomizationOffset), (int)(totalDamage * damageRandomizationOffset));
                         enemyHealth -= totalDamage;
                         break;
 
@@ -182,14 +183,17 @@
                 Console.ReadKey(true);
             }
 
-            if (enemyHealth <= 0)
+            if (enemyHealth > 0)
+            {
+                Console.WriteLine("Вы проиграли");
+            }
+            else if (playerHealth > 0)
             {
                 Console.WriteLine("Противник побеждён");
             }
-
-            if (playerHealth <= 0)
+            else
             {
-                Console.WriteLine("Вы проиграли");
+                Console.WriteLine("Ничья");
             }
 
             Console.ReadKey(true);
